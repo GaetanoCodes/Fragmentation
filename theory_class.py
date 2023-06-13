@@ -6,7 +6,7 @@ import pickle
 
 
 class FragmentationTheory:
-    def __init__(self, lambda_, alpha, step, r, t_max, derivativeOrder=150):
+    def __init__(self, lambda_, alpha, step, r, t_max, derivativeOrder=250):
         self.lambda_ = lambda_
         self.alpha = alpha
         self.step = step
@@ -21,11 +21,15 @@ class FragmentationTheory:
         )
 
     def pochhamerCoefficients(self):
-        a_k = [1]
-        for i in range(0, self.derivativeOrder):
-            a_k.append((self.lambda_ ** (1 - i * self.alpha) - 1) * a_k[-1])
-        a_k = np.array(a_k)
-        self.pochhamerVector = a_k
+
+        powers = np.arange(0,self.derivativeOrder)
+        lambdaV = (self.lambda_**(-self.alpha)) * np.ones(self.derivativeOrder)
+        lambdaV = np.power(lambdaV, powers)
+        lambdaV = self.lambda_ * lambdaV -1
+        lambdaV = np.cumprod(lambdaV)
+        lambdaV = np.hstack(([1], lambdaV))
+
+        self.pochhamerVector = lambdaV
         print(f"(*) Pochhamer coefficients vector has been built.")
 
     def deathRateDerivative(self):
@@ -76,6 +80,10 @@ class FragmentationTheory:
         self.theoryVector = np.einsum(
             "ab, bc -> acb", powerTimeFactorial, serieExpansion
         ).sum(axis=(2, 1))
+        ##
+        # self.ptsseries = np.einsum(
+        #     "ab, bc -> acb", powerTimeFactorial, serieExpansion
+        # ).sum(axis=2)[1000]
         # print(np.einsum('ab, bc -> acb', powerTimeFactorial, serieExpansion))
         print(f"(*) Theory vector has been built.")
 
@@ -98,16 +106,35 @@ class FragmentationTheory:
 
 
 if __name__ == "__main__":
-    fragmentation = FragmentationTheory(
-        lambda_=5, alpha=0.5, step=0.01, r=0.05, derivativeOrder=100, t_max=50
-    )
-    fragmentation.construction()
-    fragmentation.plotResult()
 
+    ###
+    # fragmentation_death = FragmentationTheory(
+    #     lambda_=5, alpha=0.4, step=0.01, r=0.12, derivativeOrder=100, t_max=10
+    # )
+    # fragmentation_death.construction()
+
+
+
+    # fragmentation = FragmentationTheory(
+    #     lambda_=5, alpha=3, step=0.01, r=0.0, derivativeOrder=100, t_max=20
+    # )
+    # fragmentation.construction()
+ 
+
+    # plt.scatter(range(101), (np.abs((fragmentation.ptsseries))))
+    # plt.scatter(np.array(range(101))[fragmentation.ptsseries > 0], np.ones(101)[fragmentation.ptsseries > 0], label = 'positivity')
+    # plt.scatter(np.array(range(101))[fragmentation.ptsseries < 0], np.ones(101)[fragmentation.ptsseries < 0], label = 'negativity')
+    # plt.legend()
+    # plt.grid()
+    # plt.show()
+    ###
+
+
+    # Comparison between different Lambda
     # L = []
-    # for lambda_ in np.arange(1, 10, 0.2):
+    # for lambda_ in np.arange(4, 10, 1):
     #     f = FragmentationTheory(
-    #         lambda_=lambda_, alpha=1.3, step=0.01, r=0.1, derivativeOrder=200, t_max=13
+    #         lambda_=lambda_, alpha=1.2, step=0.01, r=0., derivativeOrder=150, t_max=13
     #     )
     #     f.construction()
     #     print(f"Max réalisé en {f.maximum_}")
@@ -118,16 +145,21 @@ if __name__ == "__main__":
     # plt.legend()
     # plt.show()
 
-    # plt.scatter(np.arange(1, 10, 0.2), L)
-    # plt.show()
+    ####
+    f = FragmentationTheory(
+                lambda_=5, alpha=1.3, step=0.01, r=0., derivativeOrder=200, t_max=30
+            )
+    f.construction()
 
-    # f1 = FragmentationTheory(lambda_=2, alpha=0.4, step=0.1, r=0.1, derivativeOrder=200, t_max=40)
-    # f1.construction()
-    # f2 = FragmentationTheory(lambda_=2.5, alpha=0.4, step=0.1, r=0.1, derivativeOrder=200, t_max=40)
-    # f2.construction()
-    # plt.plot(f1.timeVector,f1.theoryVector, label = '1')
-    # plt.plot(f1.timeVector,f2.theoryVector, label = '2')
+    g = FragmentationTheory(
+                lambda_=4.5, alpha=1.3, step=0.01, r=0., derivativeOrder=200, t_max=30
+            )
+    g.construction()
 
-    # plt.plot(f1.timeVector,1+f2.theoryVector-f1.theoryVector, label = 'diff')
-    # plt.legend()
-    # plt.show()
+    # plt.plot(f.timeVector[:-1], np.diff(f.theoryVector - g.theoryVector)/0.01)
+    plt.plot(f.timeVector, (f.theoryVector - g.theoryVector))
+
+    plt.show()
+    
+
+

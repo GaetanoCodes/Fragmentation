@@ -20,6 +20,7 @@ class FragmentationSingleSimulation:
         mass = massInit
         demography = []
         for t in self.timeVector:
+            demography.append(len(mass))
             random = np.random.random(size=mass.shape)
             deadParticules = random < self.step * self.r
             random = random[~deadParticules]
@@ -31,7 +32,6 @@ class FragmentationSingleSimulation:
             massNoFrag = mass[~fragMask]
             newMass = np.repeat(mass[fragMask] / self.lambda_, self.lambda_)
             mass = np.hstack((massNoFrag, newMass))
-            demography.append(len(mass))
 
         self.finalMass = mass
         self.demography = demography
@@ -41,7 +41,7 @@ class FragmentationSingleSimulation:
         plt.show()
 
 
-class Fragmentation:
+class FragmentationSimulation:
     def __init__(self, lambda_, alpha, r, t_max, step, nSimul):
         self.paramsSingle = dict(
             lambda_=lambda_, alpha=alpha, r=r, t_max=t_max, step=step
@@ -69,27 +69,52 @@ class Fragmentation:
 
     def getStatistics(self):
         self.meanResult = np.mean(self.simulations, axis=0)
-        self.firstQuarter = np.quantile(self.simulations, 0.25, axis=0)
-        self.thirdQuarter = np.quantile(self.simulations, 0.75, axis=0)
+        self.stdEstimate = ((np.sum(self.simulations**2, axis = 0) - self.nSimul*self.meanResult**2)**(0.5))/self.nSimul
+        self.quantile5 = self.meanResult - 1.95*self.stdEstimate
+        self.quantile95 = self.meanResult + 1.95*self.stdEstimate
         fragmentationTh = FragmentationTheory(**self.paramsSingle)
         fragmentationTh.construction()
         self.theoryVector = fragmentationTh.theoryVector
 
-    def plotResult(self):
-        plt.plot(self.timeVector, self.meanResult, label="Mean")
-        plt.plot(self.timeVector, self.firstQuarter, label="1st quarter")
-        plt.plot(self.timeVector, self.thirdQuarter, label="3rd quarter")
-        plt.plot(self.timeVector, self.theoryVector, label="Serie Expansion")
+    def resultHandler(self, mode = "plot", path = ""):
+        plt.rcParams['text.usetex'] = True
+        mainlabel = "Mean" 
+        if self.nSimul == 1 :
+            mainlabel = "Realisation"
+        
+        lambda_ = self.paramsSingle["lambda_"]
+        alpha = self.paramsSingle["alpha"]
+        fontdict = {"size" : 14}
+        title = rf"Monte-Carlo simulation with $n = {self.nSimul}, \lambda ={lambda_}, \alpha = {alpha}$"
+        plt.figure(figsize=(10,5))
+        plt.plot(self.timeVector, self.meanResult, label=mainlabel)
+        plt.plot(self.timeVector, self.quantile5, label="Quantile 5%")
+        plt.plot(self.timeVector, self.quantile95, label="Quantile 95%")
+        plt.fill_between(self.timeVector, self.quantile5, self.quantile95, alpha = 0.2)
+        plt.plot(self.timeVector, self.theoryVector,marker= ".", label="Serie Expansion")
+        # params
+        plt.title(title, fontdict=fontdict )
+        plt.xlabel("Time", fontdict=fontdict)
+        plt.ylabel("Population", fontdict=fontdict)
         plt.legend()
-        plt.show()
+        if mode == "plot" :
+            plt.show()
+
+        elif mode == "save":
+            plt.savefig(path)
+
+
+
+
+
 
 
 if __name__ == "__main__":
-    params = dict(lambda_=5, alpha=0.5, r=0.1, t_max=150, step=0.2, nSimul=200)
+    params = dict(lambda_=5, alpha=0.5, r=0.1, t_max=30, step=0.2, nSimul=10000)
     f = Fragmentation(**params)
     f.timeInitialisation()
     t0 = time.time()
     f.monteCarloSimulation()
     f.getStatistics()
     print((time.time() - t0) / 100, "s")
-    f.plotResult()
+    f.plotResult(displayQuarter = True)

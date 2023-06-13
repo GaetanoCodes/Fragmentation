@@ -2,6 +2,7 @@ import numpy as np
 import simulation_class as simulation
 import theory_class as theory
 import scipy.special as sp
+import matplotlib.pyplot as plt
 
 
 class LambdaEstimation:
@@ -73,3 +74,31 @@ class LambdaEstimation:
             L.append(membreGauche - membreDroit)
 
         return l[np.argmin(np.abs(L))]
+    
+    def lambdaEstimationVectorOrder(self, orders):
+        lambdaEstimatedList = []
+        for order in orders:
+            lambdaEstimated = self.lambdaEstimation(order)
+            lambdaEstimatedList.append(lambdaEstimated)
+        return lambdaEstimatedList
+
+    def resultHandler(self, orders, mode = "plot", path = "", trueLambda = None):
+        lambdaEstimatedList = self.lambdaEstimationVectorOrder(orders)
+        title = rf"Lambda estimation for different orders and true lambda (line)"
+        fontdict = {"size" : 14}
+        plt.figure(figsize=(10,5))
+        plt.scatter(orders, lambdaEstimatedList,marker= ".", label="Lambda estimation")
+        # params
+        plt.title(title, fontdict=fontdict )
+        plt.xlabel("Orders", fontdict=fontdict)
+        plt.ylabel("Lambda Estimation", fontdict=fontdict)
+        plt.xlim((0,orders[-1]+10))
+        plt.legend()
+        if trueLambda is not None :
+            plt.hlines(trueLambda, xmin=0, xmax = orders[-1]+10, label="True Lambda")
+            plt.ylim((0,max(1.5*trueLambda, max(lambdaEstimatedList))))
+        if mode == "plot" :
+            plt.show()
+
+        elif mode == "save":
+            plt.savefig(path)
