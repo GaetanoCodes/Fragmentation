@@ -107,45 +107,6 @@ class FragmentationTheory:
 
 if __name__ == "__main__":
 
-    ###
-    # fragmentation_death = FragmentationTheory(
-    #     lambda_=5, alpha=0.4, step=0.01, r=0.12, derivativeOrder=100, t_max=10
-    # )
-    # fragmentation_death.construction()
-
-
-
-    # fragmentation = FragmentationTheory(
-    #     lambda_=5, alpha=3, step=0.01, r=0.0, derivativeOrder=100, t_max=20
-    # )
-    # fragmentation.construction()
- 
-
-    # plt.scatter(range(101), (np.abs((fragmentation.ptsseries))))
-    # plt.scatter(np.array(range(101))[fragmentation.ptsseries > 0], np.ones(101)[fragmentation.ptsseries > 0], label = 'positivity')
-    # plt.scatter(np.array(range(101))[fragmentation.ptsseries < 0], np.ones(101)[fragmentation.ptsseries < 0], label = 'negativity')
-    # plt.legend()
-    # plt.grid()
-    # plt.show()
-    ###
-
-
-    # Comparison between different Lambda
-    # L = []
-    # for lambda_ in np.arange(4, 10, 1):
-    #     f = FragmentationTheory(
-    #         lambda_=lambda_, alpha=1.2, step=0.01, r=0., derivativeOrder=150, t_max=13
-    #     )
-    #     f.construction()
-    #     print(f"Max réalisé en {f.maximum_}")
-    #     L.append(f.maximum_)
-    #     # plt.plot(f.timeVector[:-1],(f.theoryVector[1:]-f.theoryVector[:-1])/f.step, label = str(lambda_))
-    #     plt.plot(f.timeVector, (f.theoryVector), label=str(lambda_))
-
-    # plt.legend()
-    # plt.show()
-
-    ####
     f = FragmentationTheory(
                 lambda_=5, alpha=1.3, step=0.01, r=0., derivativeOrder=200, t_max=30
             )
