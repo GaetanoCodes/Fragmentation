@@ -3,29 +3,31 @@ import sympy as syp
 import scipy.special as sp
 import matplotlib.pyplot as plt
 import pickle
+from sklearn.linear_model import LinearRegression
 
 
 class FragmentationTheory:
-    def __init__(self, lambda_, alpha, step, r, t_max, derivativeOrder=250):
+    def __init__(self, lambda_, alpha, step, r, t_max, derivativeOrder=150, sigma=1):
         self.lambda_ = lambda_
         self.alpha = alpha
         self.step = step
         self.derivativeOrder = derivativeOrder
         self.r = r
         self.t_max = t_max
+        self.sigma = sigma
 
     def timeInitialisation(self):
         self.timeVector = np.linspace(0, self.t_max, int(self.t_max / self.step) + 1)
+        self.timeVectorDilated = self.lambda_ ** (-self.alpha) * self.timeVector
         print(
             f"(*) Time Vector from 0 to {self.t_max} with a {self.step} step has been built."
         )
 
     def pochhamerCoefficients(self):
-
-        powers = np.arange(0,self.derivativeOrder)
-        lambdaV = (self.lambda_**(-self.alpha)) * np.ones(self.derivativeOrder)
+        powers = np.arange(0, self.derivativeOrder)
+        lambdaV = (self.lambda_ ** (-self.alpha)) * np.ones(self.derivativeOrder)
         lambdaV = np.power(lambdaV, powers)
-        lambdaV = self.lambda_ * lambdaV -1
+        lambdaV = self.lambda_ ** (2 - self.sigma) * lambdaV - 1
         lambdaV = np.cumprod(lambdaV)
         lambdaV = np.hstack(([1], lambdaV))
 
@@ -80,6 +82,18 @@ class FragmentationTheory:
         self.theoryVector = np.einsum(
             "ab, bc -> acb", powerTimeFactorial, serieExpansion
         ).sum(axis=(2, 1))
+
+        powerTime = np.power(
+            np.repeat(
+                self.timeVectorDilated[:, None], self.derivativeOrder + 1, axis=1
+            ),
+            np.arange(self.derivativeOrder + 1),
+        )
+        factorial = sp.factorial(np.arange(self.derivativeOrder + 1))
+        powerTimeFactorial = powerTime / factorial
+        self.theoryVectorDilated = np.einsum(
+            "ab, bc -> acb", powerTimeFactorial, serieExpansion
+        ).sum(axis=(2, 1))
         ##
         # self.ptsseries = np.einsum(
         #     "ab, bc -> acb", powerTimeFactorial, serieExpansion
@@ -106,21 +120,29 @@ class FragmentationTheory:
 
 
 if __name__ == "__main__":
-
     f = FragmentationTheory(
-                lambda_=5, alpha=1.3, step=0.01, r=0., derivativeOrder=200, t_max=30
-            )
+        lambda_=4, alpha=4, step=0.1, r=0.0, derivativeOrder=250, t_max=40, sigma=1.5
+    )
     f.construction()
 
-    g = FragmentationTheory(
-                lambda_=4.5, alpha=1.3, step=0.01, r=0., derivativeOrder=200, t_max=30
-            )
-    g.construction()
+    # g = FragmentationTheory(
+    #     lambda_=4, alpha=0.7, step=0.1, r=0.0, derivativeOrder=200, t_max=40, sigma=3
+    # )
+    # g.construction()
+    # h = FragmentationTheory(
+    #     lambda_=4, alpha=1.5, step=0.1, r=0.0, derivativeOrder=200, t_max=40, sigma=3
+    # )
+    # h.construction()
+    eps = 0.5
+    equiv_epssup = f.timeVector ** ((2 - f.sigma + eps) / f.alpha)
+    equiv_epsinf = f.timeVector ** ((2 - f.sigma - eps) / f.alpha)
+    equiv = f.timeVector ** ((2 - f.sigma) / f.alpha)
+    plt.plot(f.timeVector, f.theoryVector / equiv_epssup, label="sup")
+    plt.plot(f.timeVector, f.theoryVector / equiv_epsinf, label="inf")
+    plt.plot(f.timeVector, f.theoryVector / equiv, label="True ratio")
 
-    # plt.plot(f.timeVector[:-1], np.diff(f.theoryVector - g.theoryVector)/0.01)
-    plt.plot(f.timeVector, (f.theoryVector - g.theoryVector))
+    plt.grid()
+
+    plt.legend()
 
     plt.show()
-    
-
-

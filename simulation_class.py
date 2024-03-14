@@ -69,44 +69,44 @@ class FragmentationSimulation:
 
     def getStatistics(self):
         self.meanResult = np.mean(self.simulations, axis=0)
-        self.stdEstimate = ((np.sum(self.simulations**2, axis = 0) - self.nSimul*self.meanResult**2)**(0.5))/self.nSimul
-        self.quantile5 = self.meanResult - 1.95*self.stdEstimate
-        self.quantile95 = self.meanResult + 1.95*self.stdEstimate
+        self.stdEstimate = (
+            (np.sum(self.simulations**2, axis=0) - self.nSimul * self.meanResult**2)
+            ** (0.5)
+        ) / self.nSimul
+        self.quantile5 = self.meanResult - 1.95 * self.stdEstimate
+        self.quantile95 = self.meanResult + 1.95 * self.stdEstimate
         fragmentationTh = FragmentationTheory(**self.paramsSingle)
         fragmentationTh.construction()
         self.theoryVector = fragmentationTh.theoryVector
 
-    def resultHandler(self, mode = "plot", path = ""):
-        plt.rcParams['text.usetex'] = True
-        mainlabel = "Mean" 
-        if self.nSimul == 1 :
+    def resultHandler(self, mode="plot", path=""):
+        plt.rcParams["text.usetex"] = True
+        mainlabel = "Mean"
+        if self.nSimul == 1:
             mainlabel = "Realisation"
-        
+
         lambda_ = self.paramsSingle["lambda_"]
         alpha = self.paramsSingle["alpha"]
-        fontdict = {"size" : 14}
+        fontdict = {"size": 14}
         title = rf"Monte-Carlo simulation with $n = {self.nSimul}, \lambda ={lambda_}, \alpha = {alpha}$"
-        plt.figure(figsize=(10,5))
+        plt.figure(figsize=(10, 5))
         plt.plot(self.timeVector, self.meanResult, label=mainlabel)
         plt.plot(self.timeVector, self.quantile5, label="Quantile 5%")
         plt.plot(self.timeVector, self.quantile95, label="Quantile 95%")
-        plt.fill_between(self.timeVector, self.quantile5, self.quantile95, alpha = 0.2)
-        plt.plot(self.timeVector, self.theoryVector,marker= ".", label="Serie Expansion")
+        plt.fill_between(self.timeVector, self.quantile5, self.quantile95, alpha=0.2)
+        plt.plot(
+            self.timeVector, self.theoryVector, marker=".", label="Serie Expansion"
+        )
         # params
-        plt.title(title, fontdict=fontdict )
+        plt.title(title, fontdict=fontdict)
         plt.xlabel("Time", fontdict=fontdict)
         plt.ylabel("Population", fontdict=fontdict)
         plt.legend()
-        if mode == "plot" :
+        if mode == "plot":
             plt.show()
 
         elif mode == "save":
             plt.savefig(path)
-
-
-
-
-
 
 
 if __name__ == "__main__":
@@ -117,4 +117,4 @@ if __name__ == "__main__":
     f.monteCarloSimulation()
     f.getStatistics()
     print((time.time() - t0) / 100, "s")
-    f.plotResult(displayQuarter = True)
+    f.plotResult(displayQuarter=True)
