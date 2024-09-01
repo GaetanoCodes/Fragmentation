@@ -82,7 +82,7 @@ class FragmentationSimulation:
         self.theoryVector = fragmentationTh.theoryVector
 
     def resultHandler(self, mode="plot", path=""):
-        plt.rcParams["text.usetex"] = True
+        # plt.rcParams["text.usetex"] = True
         mainlabel = "Mean"
         if self.nSimul == 1:
             mainlabel = "Realisation"
@@ -104,6 +104,7 @@ class FragmentationSimulation:
         plt.xlabel("Time", fontdict=fontdict)
         plt.ylabel("Population", fontdict=fontdict)
         plt.legend()
+        plt.grid()
         if mode == "plot":
             plt.show()
 

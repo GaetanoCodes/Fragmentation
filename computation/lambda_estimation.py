@@ -93,7 +93,7 @@ class LambdaEstimation:
         plt.xlabel("Orders", fontdict=fontdict)
         plt.ylabel("Lambda Estimation", fontdict=fontdict)
         plt.xlim((0, orders[-1] + 10))
-
+        plt.grid()
         if trueLambda is not None:
             plt.hlines(
                 trueLambda,
