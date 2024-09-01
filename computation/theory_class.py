@@ -121,6 +121,7 @@ class FragmentationTheory:
 
     def plotResult(self):
         plt.plot(self.timeVector, self.theoryVector)
+
         plt.show()
 
 

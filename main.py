@@ -5,7 +5,7 @@ from computation.figure_handler import finalFigureSave
 
 def main():
     params = dict(
-        lambda_=4,
+        lambda_=7,
         alpha=1.5,
         r=0.0,
         t_max=10,
