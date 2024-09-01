@@ -1,6 +1,6 @@
 import numpy as np
-import simulation_class as simulation
-import theory_class as theory
+import computation.simulation_class as simulation
+import computation.theory_class as theory
 import scipy.special as sp
 import matplotlib.pyplot as plt
 
@@ -93,12 +93,21 @@ class LambdaEstimation:
         plt.xlabel("Orders", fontdict=fontdict)
         plt.ylabel("Lambda Estimation", fontdict=fontdict)
         plt.xlim((0, orders[-1] + 10))
-        plt.legend()
+
         if trueLambda is not None:
-            plt.hlines(trueLambda, xmin=0, xmax=orders[-1] + 10, label="True Lambda")
+            plt.hlines(
+                trueLambda,
+                xmin=0,
+                xmax=orders[-1] + 10,
+                label="True Lambda",
+                color="red",
+            )
             plt.ylim((0, max(1.5 * trueLambda, max(lambdaEstimatedList))))
+            plt.legend()
         if mode == "plot":
+            plt.legend()
             plt.show()
 
         elif mode == "save":
+            plt.legend()
             plt.savefig(path)

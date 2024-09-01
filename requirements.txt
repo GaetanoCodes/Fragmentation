@@ -1,0 +1,26 @@
+contourpy @ file:///croot/contourpy_1700583582875/work
+cycler @ file:///tmp/build/80754af9/cycler_1637851556182/work
+fonttools @ file:///croot/fonttools_1713551344105/work
+gmpy2 @ file:///tmp/build/80754af9/gmpy2_1645455533097/work
+kiwisolver @ file:///croot/kiwisolver_1672387140495/work
+matplotlib @ file:///croot/matplotlib-suite_1713336378214/work
+mkl-fft @ file:///croot/mkl_fft_1695058164594/work
+mkl-random @ file:///croot/mkl_random_1695059800811/work
+mkl-service==2.4.0
+mpmath @ file:///croot/mpmath_1690848262763/work
+numpy @ file:///croot/numpy_and_numpy_base_1708638617955/work/dist/numpy-1.26.4-cp310-cp310-linux_x86_64.whl#sha256=d8cd837ed43e87f77e6efaa08e8de927ca030a1c9c5d04624432d6fb9a74a5ee
+packaging @ file:///croot/packaging_1720101850331/work
+pillow @ file:///croot/pillow_1721059439630/work
+ply==3.11
+pyparsing @ file:///opt/conda/conda-bld/pyparsing_1661452539315/work
+PyQt5==5.15.10
+PyQt5-sip @ file:///croot/pyqt-split_1698769088074/work/pyqt_sip
+python-dateutil @ file:///croot/python-dateutil_1716495738603/work
+scipy @ file:///croot/scipy_1717521478074/work/dist/scipy-1.13.1-cp310-cp310-linux_x86_64.whl#sha256=c73757af21f88127db3e72c16ee95d5a104ebd533b662667d352c0765772cf83
+sip @ file:///croot/sip_1698675935381/work
+six @ file:///tmp/build/80754af9/six_1644875935023/work
+sympy @ file:///croot/sympy_1724938189289/work
+tomli @ file:///opt/conda/conda-bld/tomli_1657175507142/work
+tornado @ file:///croot/tornado_1718740109488/work
+tqdm @ file:///croot/tqdm_1724853939799/work
+unicodedata2 @ file:///croot/unicodedata2_1713212950228/work

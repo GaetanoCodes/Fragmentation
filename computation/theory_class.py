@@ -2,12 +2,22 @@ import numpy as np
 import sympy as syp
 import scipy.special as sp
 import matplotlib.pyplot as plt
-import pickle
-from sklearn.linear_model import LinearRegression
+
+# import pickle
+# from sklearn.linear_model import LinearRegression
 
 
 class FragmentationTheory:
-    def __init__(self, lambda_, alpha, step, r, t_max, derivativeOrder=150, sigma=1):
+    def __init__(
+        self,
+        lambda_: float,
+        alpha: float,
+        step: float,
+        r: float,
+        t_max: int,
+        derivativeOrder: int = 150,
+        sigma: float = 1,
+    ):
         self.lambda_ = lambda_
         self.alpha = alpha
         self.step = step
@@ -94,11 +104,6 @@ class FragmentationTheory:
         self.theoryVectorDilated = np.einsum(
             "ab, bc -> acb", powerTimeFactorial, serieExpansion
         ).sum(axis=(2, 1))
-        ##
-        # self.ptsseries = np.einsum(
-        #     "ab, bc -> acb", powerTimeFactorial, serieExpansion
-        # ).sum(axis=2)[1000]
-        # print(np.einsum('ab, bc -> acb', powerTimeFactorial, serieExpansion))
         print(f"(*) Theory vector has been built.")
 
     def maximum(self):

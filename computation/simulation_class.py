@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from theory_class import FragmentationTheory
-import time
+from computation.theory_class import FragmentationTheory
+import tqdm
+
+# import time
 
 
 class FragmentationSingleSimulation:
@@ -58,12 +60,12 @@ class FragmentationSimulation:
 
     def monteCarloSimulation(self):
         L = []
-        for nSimul in range(self.nSimul):
+        for nSimul in tqdm.tqdm(range(self.nSimul)):
             f = FragmentationSingleSimulation(**self.paramsSingle)
             f.timeInitialisation()
             f.simulation()
             L.append(f.demography)
-            print(nSimul)
+            # print(nSimul)
 
         self.simulations = np.array(L)
 
@@ -109,12 +111,12 @@ class FragmentationSimulation:
             plt.savefig(path)
 
 
-if __name__ == "__main__":
-    params = dict(lambda_=5, alpha=0.5, r=0.1, t_max=30, step=0.2, nSimul=10000)
-    f = Fragmentation(**params)
-    f.timeInitialisation()
-    t0 = time.time()
-    f.monteCarloSimulation()
-    f.getStatistics()
-    print((time.time() - t0) / 100, "s")
-    f.plotResult(displayQuarter=True)
+# if __name__ == "__main__":
+#     params = dict(lambda_=5, alpha=0.5, r=0.1, t_max=30, step=0.2, nSimul=10000)
+#     f = Fragmentation(**params)
+#     f.timeInitialisation()
+#     t0 = time.time()
+#     f.monteCarloSimulation()
+#     f.getStatistics()
+#     print((time.time() - t0) / 100, "s")
+#     f.plotResult(displayQuarter=True)
