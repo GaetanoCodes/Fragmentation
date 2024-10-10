@@ -1,38 +1,40 @@
 import numpy as np
-import computation.simulation_class as simulation
-import computation.theory_class as theory
 import scipy.special as sp
 import matplotlib.pyplot as plt
 
+import scienceplots
+
+plt.style.use("science")
+
 
 class LambdaEstimation:
-    def __init__(self, r, alpha, theoryVector, timeVector):
-        self.theoryVector = theoryVector
-        self.timeVector = timeVector
+    def __init__(self, r, alpha, theory_vector, time_vector):
+        self.theory_vector = theory_vector
+        self.time_vector = time_vector
         self.r = r
         self.alpha = alpha
 
-    def basicMatrixes(self, order):
+    def basic_matrices(self, order):
         tK = np.power(
-            np.repeat(self.timeVector[:, None], order + 1, axis=1),
+            np.repeat(self.time_vector[:, None], order + 1, axis=1),
             np.arange(order + 1),
         )
-        kFact = sp.factorial(np.arange(order + 1))
-        tFact = tK / kFact
+        k_fact = sp.factorial(np.arange(order + 1))
+        t_fact = tK / k_fact
         # to be changed with r derivative matrix
-        return tFact
+        return t_fact
 
-    def derivativeLambdaVector(self, lambda_, order):
-        premierTerme = 1 - self.alpha * np.arange(order + 1)
-        deuxiemeTerme = np.power(
+    def derivative_lambda_vector(self, lambda_, order):
+        premier_terme = 1 - self.alpha * np.arange(order + 1)
+        deuxieme_terme = np.power(
             lambda_ * np.ones(order + 1), -self.alpha * np.arange(order + 1)
         )
-        troisiemeTerme = (
+        troisieme_terme = (
             np.power(
                 lambda_ * np.ones(order + 1), 1 - self.alpha * np.arange(order + 1)
             )
         ) - 1
-        somme = premierTerme * deuxiemeTerme / troisiemeTerme
+        somme = premier_terme * deuxieme_terme / troisieme_terme
         # vecteur de la somme
 
         if np.isnan(somme).sum() > 0:
@@ -42,9 +44,9 @@ class LambdaEstimation:
 
         mask = np.tril(np.ones((order + 1, order + 1)))
 
-        vectorAi = self.lambdaVector(lambda_, order)[:, None]
-        finalVector = (mask * vectorAi * somme).sum(axis=1)
-        return finalVector
+        vector_ai = self.lambdaVector(lambda_, order)[:, None]
+        final_vector = (mask * vector_ai * somme).sum(axis=1)
+        return final_vector
 
     def lambdaVector(self, lamb, order):
         lambdaVect = np.cumprod(
@@ -57,15 +59,15 @@ class LambdaEstimation:
     def lambdaEstimation(self, order):
         L = []
         l = []
-        basicMatrix = self.basicMatrixes(order)
+        basicMatrix = self.basic_matrices(order)
         for lamb_ in np.linspace(1.01, 10, 100):
             membreGauche = (
-                self.derivativeLambdaVector(lamb_, order)
+                self.derivative_lambda_vector(lamb_, order)
                 .dot(basicMatrix.T)
-                .dot(self.theoryVector)
+                .dot(self.theory_vector)
             )
             membreDroit = (
-                self.derivativeLambdaVector(lamb_, order)
+                self.derivative_lambda_vector(lamb_, order)
                 .dot(basicMatrix.T)
                 .dot(basicMatrix)
                 .dot(self.lambdaVector(lamb_, order))
@@ -75,34 +77,36 @@ class LambdaEstimation:
 
         return l[np.argmin(np.abs(L))]
 
-    def lambdaEstimationVectorOrder(self, orders):
-        lambdaEstimatedList = []
+    def lambda_estimation_vector_order(self, orders):
+        lambda_estimated_list = []
         for order in orders:
             lambdaEstimated = self.lambdaEstimation(order)
-            lambdaEstimatedList.append(lambdaEstimated)
-        return lambdaEstimatedList
+            lambda_estimated_list.append(lambdaEstimated)
+        return lambda_estimated_list
 
-    def resultHandler(self, orders, mode="plot", path="", trueLambda=None):
-        lambdaEstimatedList = self.lambdaEstimationVectorOrder(orders)
+    def result_handler(self, orders, mode="plot", path="", true_lambda=None):
+        lambda_estimated_list = self.lambda_estimation_vector_order(orders)
         title = rf"Lambda estimation for different orders and true lambda (line)"
         fontdict = {"size": 14}
         plt.figure(figsize=(10, 5))
-        plt.scatter(orders, lambdaEstimatedList, marker=".", label="Lambda estimation")
+        plt.scatter(
+            orders, lambda_estimated_list, marker=".", label="Lambda estimation"
+        )
         # params
         plt.title(title, fontdict=fontdict)
         plt.xlabel("Orders", fontdict=fontdict)
         plt.ylabel("Lambda Estimation", fontdict=fontdict)
         plt.xlim((0, orders[-1] + 10))
         plt.grid()
-        if trueLambda is not None:
+        if true_lambda is not None:
             plt.hlines(
-                trueLambda,
+                true_lambda,
                 xmin=0,
                 xmax=orders[-1] + 10,
                 label="True Lambda",
                 color="red",
             )
-            plt.ylim((0, max(1.5 * trueLambda, max(lambdaEstimatedList))))
+            plt.ylim((0, max(1.5 * true_lambda, max(lambda_estimated_list))))
             plt.legend()
         if mode == "plot":
             plt.legend()

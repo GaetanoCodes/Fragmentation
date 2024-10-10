@@ -4,6 +4,9 @@ from computation.theory_class import FragmentationTheory
 import tqdm
 
 # import time
+import scienceplots
+
+plt.style.use("science")
 
 
 class FragmentationSingleSimulation:
@@ -15,13 +18,13 @@ class FragmentationSingleSimulation:
         self.step = step
 
     def timeInitialisation(self):
-        self.timeVector = np.linspace(0, self.t_max, int(self.t_max / self.step) + 1)
+        self.time_vector = np.linspace(0, self.t_max, int(self.t_max / self.step) + 1)
 
     def simulation(self):
         massInit = np.array([1])
         mass = massInit
         demography = []
-        for t in self.timeVector:
+        for t in self.time_vector:
             demography.append(len(mass))
             random = np.random.random(size=mass.shape)
             deadParticules = random < self.step * self.r
@@ -39,65 +42,65 @@ class FragmentationSingleSimulation:
         self.demography = demography
 
     def plotResult(self):
-        plt.plot(self.timeVector, self.demography)
+        plt.plot(self.time_vector, self.demography)
         plt.show()
 
 
-class FragmentationSimulation:
-    def __init__(self, lambda_, alpha, r, t_max, step, nSimul):
+class Fragmentation_simulation:
+    def __init__(self, lambda_, alpha, r, t_max, step, n_simul):
         self.paramsSingle = dict(
             lambda_=lambda_, alpha=alpha, r=r, t_max=t_max, step=step
         )
-        self.nSimul = nSimul
+        self.n_simul = n_simul
         self.t_max = t_max
         self.step = step
 
     def timeInitialisation(self):
-        self.timeVector = np.linspace(0, self.t_max, int(self.t_max / self.step) + 1)
+        self.time_vector = np.linspace(0, self.t_max, int(self.t_max / self.step) + 1)
         print(
             f"(*) Time Vector from 0 to {self.t_max} with a {self.step} step has been built."
         )
 
     def monteCarloSimulation(self):
         L = []
-        for nSimul in tqdm.tqdm(range(self.nSimul)):
+        for n_simul in tqdm.tqdm(range(self.n_simul)):
             f = FragmentationSingleSimulation(**self.paramsSingle)
             f.timeInitialisation()
             f.simulation()
             L.append(f.demography)
-            # print(nSimul)
+            # print(n_simul)
 
         self.simulations = np.array(L)
 
     def getStatistics(self):
         self.meanResult = np.mean(self.simulations, axis=0)
         self.stdEstimate = (
-            (np.sum(self.simulations**2, axis=0) - self.nSimul * self.meanResult**2)
+            (np.sum(self.simulations**2, axis=0) - self.n_simul * self.meanResult**2)
             ** (0.5)
-        ) / self.nSimul
+        ) / self.n_simul
         self.quantile5 = self.meanResult - 1.95 * self.stdEstimate
         self.quantile95 = self.meanResult + 1.95 * self.stdEstimate
         fragmentationTh = FragmentationTheory(**self.paramsSingle)
         fragmentationTh.construction()
-        self.theoryVector = fragmentationTh.theoryVector
+        self.theory_vector = fragmentationTh.theory_vector
 
-    def resultHandler(self, mode="plot", path=""):
+    def result_handler(self, mode="plot", path=""):
         # plt.rcParams["text.usetex"] = True
         mainlabel = "Mean"
-        if self.nSimul == 1:
+        if self.n_simul == 1:
             mainlabel = "Realisation"
 
         lambda_ = self.paramsSingle["lambda_"]
         alpha = self.paramsSingle["alpha"]
         fontdict = {"size": 14}
-        title = rf"Monte-Carlo simulation with $n = {self.nSimul}, \lambda ={lambda_}, \alpha = {alpha}$"
+        title = rf"Monte-Carlo simulation with $n = {self.n_simul}, \lambda ={lambda_}, \alpha = {alpha}$"
         plt.figure(figsize=(10, 5))
-        plt.plot(self.timeVector, self.meanResult, label=mainlabel)
-        plt.plot(self.timeVector, self.quantile5, label="Quantile 5%")
-        plt.plot(self.timeVector, self.quantile95, label="Quantile 95%")
-        plt.fill_between(self.timeVector, self.quantile5, self.quantile95, alpha=0.2)
+        plt.plot(self.time_vector, self.meanResult, label=mainlabel)
+        plt.plot(self.time_vector, self.quantile5, label="Quantile 5%")
+        plt.plot(self.time_vector, self.quantile95, label="Quantile 95%")
+        plt.fill_between(self.time_vector, self.quantile5, self.quantile95, alpha=0.2)
         plt.plot(
-            self.timeVector, self.theoryVector, marker=".", label="Serie Expansion"
+            self.time_vector, self.theory_vector, marker=".", label="Serie Expansion"
         )
         # params
         plt.title(title, fontdict=fontdict)
@@ -110,14 +113,3 @@ class FragmentationSimulation:
 
         elif mode == "save":
             plt.savefig(path)
-
-
-# if __name__ == "__main__":
-#     params = dict(lambda_=5, alpha=0.5, r=0.1, t_max=30, step=0.2, nSimul=10000)
-#     f = Fragmentation(**params)
-#     f.timeInitialisation()
-#     t0 = time.time()
-#     f.monteCarloSimulation()
-#     f.getStatistics()
-#     print((time.time() - t0) / 100, "s")
-#     f.plotResult(displayQuarter=True)

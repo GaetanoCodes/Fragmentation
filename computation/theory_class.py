@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 
 # import pickle
 # from sklearn.linear_model import LinearRegression
+import scienceplots
+
+plt.style.use("science")
 
 
 class FragmentationTheory:
@@ -27,8 +30,8 @@ class FragmentationTheory:
         self.sigma = sigma
 
     def timeInitialisation(self):
-        self.timeVector = np.linspace(0, self.t_max, int(self.t_max / self.step) + 1)
-        self.timeVectorDilated = self.lambda_ ** (-self.alpha) * self.timeVector
+        self.time_vector = np.linspace(0, self.t_max, int(self.t_max / self.step) + 1)
+        self.time_vectorDilated = self.lambda_ ** (-self.alpha) * self.time_vector
         print(
             f"(*) Time Vector from 0 to {self.t_max} with a {self.step} step has been built."
         )
@@ -84,30 +87,30 @@ class FragmentationTheory:
     def expansion(self):
         serieExpansion = self.pochhamerVector * self.binomMatrix * self.deathRateMatrix
         powerTime = np.power(
-            np.repeat(self.timeVector[:, None], self.derivativeOrder + 1, axis=1),
+            np.repeat(self.time_vector[:, None], self.derivativeOrder + 1, axis=1),
             np.arange(self.derivativeOrder + 1),
         )
         factorial = sp.factorial(np.arange(self.derivativeOrder + 1))
         powerTimeFactorial = powerTime / factorial
-        self.theoryVector = np.einsum(
+        self.theory_vector = np.einsum(
             "ab, bc -> acb", powerTimeFactorial, serieExpansion
         ).sum(axis=(2, 1))
 
         powerTime = np.power(
             np.repeat(
-                self.timeVectorDilated[:, None], self.derivativeOrder + 1, axis=1
+                self.time_vectorDilated[:, None], self.derivativeOrder + 1, axis=1
             ),
             np.arange(self.derivativeOrder + 1),
         )
         factorial = sp.factorial(np.arange(self.derivativeOrder + 1))
         powerTimeFactorial = powerTime / factorial
-        self.theoryVectorDilated = np.einsum(
+        self.theory_vectorDilated = np.einsum(
             "ab, bc -> acb", powerTimeFactorial, serieExpansion
         ).sum(axis=(2, 1))
         print(f"(*) Theory vector has been built.")
 
     def maximum(self):
-        self.maximum_ = self.timeVector[np.argmax(self.theoryVector)]
+        self.maximum_ = self.time_vector[np.argmax(self.theory_vector)]
 
     def construction(self):
         print("####### Construction ######")
@@ -120,35 +123,6 @@ class FragmentationTheory:
         print("#### END Construction #####")
 
     def plotResult(self):
-        plt.plot(self.timeVector, self.theoryVector)
+        plt.plot(self.time_vector, self.theory_vector)
 
         plt.show()
-
-
-if __name__ == "__main__":
-    f = FragmentationTheory(
-        lambda_=4, alpha=4, step=0.1, r=0.0, derivativeOrder=250, t_max=40, sigma=1.5
-    )
-    f.construction()
-
-    # g = FragmentationTheory(
-    #     lambda_=4, alpha=0.7, step=0.1, r=0.0, derivativeOrder=200, t_max=40, sigma=3
-    # )
-    # g.construction()
-    # h = FragmentationTheory(
-    #     lambda_=4, alpha=1.5, step=0.1, r=0.0, derivativeOrder=200, t_max=40, sigma=3
-    # )
-    # h.construction()
-    eps = 0.5
-    equiv_epssup = f.timeVector ** ((2 - f.sigma + eps) / f.alpha)
-    equiv_epsinf = f.timeVector ** ((2 - f.sigma - eps) / f.alpha)
-    equiv = f.timeVector ** ((2 - f.sigma) / f.alpha)
-    plt.plot(f.timeVector, f.theoryVector / equiv_epssup, label="sup")
-    plt.plot(f.timeVector, f.theoryVector / equiv_epsinf, label="inf")
-    plt.plot(f.timeVector, f.theoryVector / equiv, label="True ratio")
-
-    plt.grid()
-
-    plt.legend()
-
-    plt.show()
