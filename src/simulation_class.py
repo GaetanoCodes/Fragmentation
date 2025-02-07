@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from computation.theory_class import FragmentationTheory
+from src.theory_class import FragmentationTheory
 import tqdm
 
 # import time
@@ -18,7 +18,8 @@ class FragmentationSingleSimulation:
         self.step = step
 
     def timeInitialisation(self):
-        self.time_vector = np.linspace(0, self.t_max, int(self.t_max / self.step) + 1)
+        self.time_vector = np.linspace(
+            0, self.t_max, int(self.t_max / self.step) + 1)
 
     def simulation(self):
         massInit = np.array([1])
@@ -56,7 +57,8 @@ class Fragmentation_simulation:
         self.step = step
 
     def timeInitialisation(self):
-        self.time_vector = np.linspace(0, self.t_max, int(self.t_max / self.step) + 1)
+        self.time_vector = np.linspace(
+            0, self.t_max, int(self.t_max / self.step) + 1)
         print(
             f"(*) Time Vector from 0 to {self.t_max} with a {self.step} step has been built."
         )
@@ -75,7 +77,8 @@ class Fragmentation_simulation:
     def getStatistics(self):
         self.meanResult = np.mean(self.simulations, axis=0)
         self.stdEstimate = (
-            (np.sum(self.simulations**2, axis=0) - self.n_simul * self.meanResult**2)
+            (np.sum(self.simulations**2, axis=0) -
+             self.n_simul * self.meanResult**2)
             ** (0.5)
         ) / self.n_simul
         self.quantile5 = self.meanResult - 1.95 * self.stdEstimate
@@ -98,7 +101,8 @@ class Fragmentation_simulation:
         plt.plot(self.time_vector, self.meanResult, label=mainlabel)
         plt.plot(self.time_vector, self.quantile5, label="Quantile 5%")
         plt.plot(self.time_vector, self.quantile95, label="Quantile 95%")
-        plt.fill_between(self.time_vector, self.quantile5, self.quantile95, alpha=0.2)
+        plt.fill_between(self.time_vector, self.quantile5,
+                         self.quantile95, alpha=0.2)
         plt.plot(
             self.time_vector, self.theory_vector, marker=".", label="Serie Expansion"
         )

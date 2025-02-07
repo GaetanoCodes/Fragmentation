@@ -1,9 +1,10 @@
-import matplotlib.pyplot as plt
-import computation.simulation_class as simulation
-import computation.lambda_estimation as estimation
 import os
 
+import matplotlib.pyplot as plt
 import scienceplots
+
+import src.lambda_estimation as estimation
+import src.simulation_class as simulation
 
 plt.style.use("science")
 
